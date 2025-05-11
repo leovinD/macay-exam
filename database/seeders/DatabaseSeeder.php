@@ -42,10 +42,15 @@ class DatabaseSeeder extends Seeder
         // }
 
         $this->call([
-            BoardingHouseSeeder::class,
-            RoomSeeder::class,
-            TenantSeeder::class,
-            PaymentSeeder::class,
+            // BoardingHouseSeeder::class,
+            // RoomSeeder::class,
+            // TenantSeeder::class,
+            // PaymentSeeder::class,
+
+            BrandSeeder::class,
+            CategorySeeder::class,
+            BagSeeder::class,
+            StockTransactionSeeder::class,
         ]);
     }
 }
