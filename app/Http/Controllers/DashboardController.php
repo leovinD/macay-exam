@@ -18,20 +18,29 @@ class DashboardController extends Controller
         $totalBags = Bag::count();
         $totalStockTransactions = StockTransaction::count();
 
-        // 📊 Stock transactions per month
+        // 📊 Stock transactions per month by type
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        // Query the stock transactions by month
-        $stockTransactionsRaw = StockTransaction::selectRaw('DATE_FORMAT(transaction_date, "%b") as month, COUNT(*) as total')
+        $incomingRaw = StockTransaction::selectRaw('DATE_FORMAT(transaction_date, "%b") as month, COUNT(*) as total')
+            ->where('type', 'incoming')
             ->groupBy('month')
             ->get()
             ->pluck('total', 'month')
             ->toArray();
 
-        // Initialize the stock transactions array with zero values for each month
-        $stockTransactionsPerMonth = [];
+        $outgoingRaw = StockTransaction::selectRaw('DATE_FORMAT(transaction_date, "%b") as month, COUNT(*) as total')
+            ->where('type', 'outgoing')
+            ->groupBy('month')
+            ->get()
+            ->pluck('total', 'month')
+            ->toArray();
+
+        $incomingPerMonth = [];
+        $outgoingPerMonth = [];
+
         foreach ($months as $month) {
-            $stockTransactionsPerMonth[] = $stockTransactionsRaw[$month] ?? 0;
+            $incomingPerMonth[] = $incomingRaw[$month] ?? 0;
+            $outgoingPerMonth[] = $outgoingRaw[$month] ?? 0;
         }
 
         // 🥧 Bags per category
@@ -47,9 +56,10 @@ class DashboardController extends Controller
             'totalCategories',
             'totalBags',
             'totalStockTransactions',
-            'stockTransactionsPerMonth',
-            'bagsPerCategoryData',
-            'months'
+            'months',
+            'incomingPerMonth',
+            'outgoingPerMonth',
+            'bagsPerCategoryData'
         ));
     }
 }

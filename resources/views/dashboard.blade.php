@@ -82,25 +82,52 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Stock Transactions Per Month Bar Chart
-    const stockTransactionsCtx = document.getElementById('stockTransactionsChart').getContext('2d');
-    new Chart(stockTransactionsCtx, {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($months) !!},
-            datasets: [{
-                label: 'Transactions',
-                data: {!! json_encode($stockTransactionsPerMonth) !!},
-                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
+    // Stock Transactions Per Month Line Chart
+const stockTransactionsCtx = document.getElementById('stockTransactionsChart').getContext('2d');
+new Chart(stockTransactionsCtx, {
+    type: 'line',
+    data: {
+        labels: {!! json_encode($months) !!},
+        datasets: [
+            {
+                label: 'Incoming',
+                data: {!! json_encode($incomingPerMonth) !!},
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)'
+            },
+            {
+                label: 'Outgoing',
+                data: {!! json_encode($outgoingPerMonth) !!},
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(255, 99, 132, 1)'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
         },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true } },
-            plugins: { legend: { display: false } }
+        plugins: {
+            legend: {
+                position: 'top'
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false
+            }
         }
-    });
+    }
+});
+
 
     // Bags Per Category Doughnut Chart
     const bagsPerCategoryCtx = document.getElementById('bagsPerCategoryChart').getContext('2d');
