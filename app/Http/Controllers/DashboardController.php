@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // 📦 Bag and brand stats
+        // 📦 Basic counts
         $totalBrands = Brand::count();
         $totalCategories = Category::count();
         $totalBags = Bag::count();
@@ -43,12 +43,35 @@ class DashboardController extends Controller
             $outgoingPerMonth[] = $outgoingRaw[$month] ?? 0;
         }
 
-        // 🥧 Bags per category
+        // 🥧 Bags per category (count)
         $bagsPerCategoryData = Category::select('categories.name as category_name', DB::raw('COUNT(bags.id) as total'))
             ->leftJoin('bags', 'categories.id', '=', 'bags.category_id')
             ->groupBy('categories.name')
             ->orderBy('categories.name')
             ->get();
+
+        // 👜 Bags per brand (count)
+        $bagsPerBrandData = Brand::select('brands.name as brand_name', DB::raw('COUNT(bags.id) as total'))
+            ->leftJoin('bags', 'brands.id', '=', 'bags.brand_id')
+            ->groupBy('brands.name')
+            ->orderBy('brands.name')
+            ->get();
+
+        // 📦 Stock quantity per brand (THIS is what you need for your new doughnut chart)
+        $stockPerBrand = Brand::select('brands.name as brand_name', DB::raw('SUM(bags.stockQuantity) as total_stock'))
+            ->leftJoin('bags', 'brands.id', '=', 'bags.brand_id')
+            ->groupBy('brands.name')
+            ->orderBy('brands.name')
+            ->get();
+
+        // 📋 Bags grouped by category and brand (if needed)
+        $bagsGroupedByCategory = Bag::select('category_id', 'brand_id', DB::raw('SUM(stockQuantity) as total_quantity'))
+            ->with(['category', 'brand'])
+            ->groupBy('category_id', 'brand_id')
+            ->get();
+
+        // 📦 All bags list (if needed)
+        $bagsList = Bag::all();
 
         // Return to view
         return view('dashboard', compact(
@@ -59,7 +82,11 @@ class DashboardController extends Controller
             'months',
             'incomingPerMonth',
             'outgoingPerMonth',
-            'bagsPerCategoryData'
+            'bagsPerCategoryData',
+            'bagsPerBrandData',
+            'stockPerBrand', // 👈 pass this to your view
+            'bagsGroupedByCategory',
+            'bagsList'
         ));
     }
 }

@@ -24,17 +24,6 @@
             </div>
         </div>
 
-        {{-- <div class="col-lg-3 col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">Bags Per Brand</h5>
-                    @foreach ($bagsPerBrandData as $brand)
-                        <p class="fw-bold text-warning">{{ $brand->brand_name }}: {{ $brand->total }} Bags</p>
-                    @endforeach
-                </div>
-            </div>
-        </div> --}}
-
         <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
@@ -66,12 +55,44 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-4">Stock Quantity Per Brand</h5>
+            <div style="position: relative; height:300px; width:100%;">
+                <canvas id="stockPerBrandChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    {{-- Bags List with Brand and Quantity --}}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent fw-bold">Bags List (Availbale)</div>
                 <div class="card-body">
-                    <h5 class="card-title fw-bold mb-4">Bags Per Category</h5>
-                    <div style="position: relative; height:300px; width:100%;">
-                        <canvas id="bagsPerCategoryChart"></canvas>
-                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Bag Name</th>
+                                <th>Brand</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($bagsList as $bag)
+                                <tr>
+                                    <td>{{ $bag->name }}</td>
+                                    <td>{{ $bag->brand->name }}</td>
+                                    <td>{{ $bag->category->name }}</td>
+                                    <td>{{ $bag->stockQuantity }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -81,7 +102,6 @@
 {{-- Charts JS --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Stock Transactions Per Month Bar Chart
     // Stock Transactions Per Month Line Chart
 const stockTransactionsCtx = document.getElementById('stockTransactionsChart').getContext('2d');
 new Chart(stockTransactionsCtx, {
@@ -129,51 +149,50 @@ new Chart(stockTransactionsCtx, {
 });
 
 
-    // Bags Per Category Doughnut Chart
-    const bagsPerCategoryCtx = document.getElementById('bagsPerCategoryChart').getContext('2d');
-    new Chart(bagsPerCategoryCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {!! json_encode($bagsPerCategoryData->pluck('category_name')) !!},
-            datasets: [{
-                data: {!! json_encode($bagsPerCategoryData->pluck('total')) !!},
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.label || '';
-                            if (context.parsed !== null) {
-                                label += ': ' + context.parsed;
-                            }
-                            return label;
+    // Stock Quantity Per Brand Doughnut Chart
+const stockPerBrandCtx = document.getElementById('stockPerBrandChart').getContext('2d');
+new Chart(stockPerBrandCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {!! json_encode($stockPerBrand->pluck('brand_name')) !!},
+        datasets: [{
+            data: {!! json_encode($stockPerBrand->pluck('total_stock')) !!},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(199, 199, 199, 0.8)',
+                'rgba(83, 102, 255, 0.8)',
+                'rgba(255, 102, 153, 0.8)',
+                'rgba(60, 179, 113, 0.8)'
+            ],
+            borderColor: 'rgba(255, 255, 255, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (context.parsed !== null) {
+                            label += ': ' + context.parsed;
                         }
+                        return label;
                     }
                 }
             }
         }
-    });
+    }
+});
+
+
 </script>
 @endsection

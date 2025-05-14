@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bag extends Model
 {
-     protected $fillable = ['name', 'brand_id', 'category_id', 'price'];
+     protected $fillable = ['name', 'brand_id', 'category_id', 'stockQuantity'];
 
     public function brand() {
         return $this->belongsTo(Brand::class);
